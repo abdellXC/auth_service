@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[Route('/api/password', name: 'api_password_')]
+#[Route('/password', name: 'api_password_')]
 class PasswordResetController extends AbstractController
 {
     public function __construct(
@@ -122,5 +122,21 @@ class PasswordResetController extends AbstractController
                 'error' => 'An error occurred while verifying the token'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    #[Route('/forgot-form', name: 'forgot_form', methods: ['GET'])]
+    public function showForgotPasswordForm(): Response
+    {
+        return $this->render('password/forgot.html.twig');
+    }
+
+    #[Route('/reset-form', name: 'reset_form', methods: ['GET'])]
+    public function showResetPasswordForm(Request $request): Response
+    {
+        $token = $request->query->get('token', '');
+        
+        return $this->render('password/reset.html.twig', [
+            'token' => $token
+        ]);
     }
 }

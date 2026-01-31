@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .password-requirements {
+            background-color: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #4a5568;
+        }
+
+        .password-requirements ul {
+            margin: 8px 0 0 20px;
+        }
+
+        .password-requirements li {
+            margin: 4px 0;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.success {
+            background-color: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #38a169;
+        }
+
+        .alert.error {
+            background-color: #fed7d7;
+            color: #742a2a;
+            border-left: 4px solid #e53e3e;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔑 Reset Password</h1>
+            <p>Enter your new password below.</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <form id="resetPasswordForm">
+            <input type="hidden" id="token" name="token" value="{{ token }}">
+            
+            <div class="form-group">
+                <label for="password">New Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Enter new password"
+                    required
+                    autocomplete="new-password"
+                >
+                <div class="password-requirements">
+                    <strong>Password must contain:</strong>
+                    <ul>
+                        <li>At least 8 characters</li>
+                        <li>One uppercase letter</li>
+                        <li>One lowercase letter</li>
+                        <li>One number</li>
+                        <li>One special character (@$!%*?&)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="passwordConfirmation">Confirm Password</label>
+                <input 
+                    type="password" 
+                    id="passwordConfirmation" 
+                    name="passwordConfirmation" 
+                    placeholder="Confirm new password"
+                    required
+                    autocomplete="new-password"
+                >
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                <span id="btnText">Reset Password</span>
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="/api/login">← Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('resetPasswordForm');
+        const tokenInput = document.getElementById('token');
+        const passwordInput = document.getElementById('password');
+        const passwordConfirmationInput = document.getElementById('passwordConfirmation');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const alert = document.getElementById('alert');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        function showAlert(message, type) {
+            alert.textContent = message;
+            alert.className = `alert ${type} show`;
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+
+        async function verifyToken() {
+            const token = tokenInput.value;
+            
+            if (!token) {
+                showAlert('Invalid reset link. Please request a new password reset.', 'error');
+                submitBtn.disabled = true;
+                return;
+            }
+
+            loadingOverlay.style.display = 'flex';
+
+            try {
+                const response = await fetch(`/api/password/reset/verify/${token}`);
+                const data = await response.json();
+
+                if (!data.valid) {
+                    showAlert('This reset link is invalid or has expired. Please request a new password reset.', 'error');
+                    submitBtn.disabled = true;
+                }
+            } catch (error) {
+                showAlert('Unable to verify reset link. Please try again.', 'error');
+                submitBtn.disabled = true;
+            } finally {
+                loadingOverlay.style.display = 'none';
+            }
+        }
+
+        verifyToken();
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const token = tokenInput.value;
+            const password = passwordInput.value;
+            const passwordConfirmation = passwordConfirmationInput.value;
+
+            if (!token) {
+                showAlert('Invalid reset token', 'error');
+                return;
+            }
+
+            if (password !== passwordConfirmation) {
+                showAlert('Passwords do not match', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            btnText.innerHTML = '<span class="loader"></span>Resetting...';
+
+            try {
+                const response = await fetch('/api/password/reset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token,
+                        password,
+                        passwordConfirmation
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('Password successfully reset! Redirecting to login...', 'success');
+                    passwordInput.value = '';
+                    passwordConfirmationInput.value = '';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/api/login';
+                    }, 2000);
+                } else {
+                    const errorMessage = data.error || 
+                                       data.errors?.password || 
+                                       data.errors?.passwordConfirmation ||
+                                       'An error occurred. Please try again.';
+                    showAlert(errorMessage, 'error');
+                    submitBtn.disabled = false;
+                    btnText.textContent = 'Reset Password';
+                }
+            } catch (error) {
+                showAlert('Network error. Please check your connection and try again.', 'error');
+                submitBtn.disabled = false;
+                btnText.textContent = 'Reset Password';
+            }
+        });
+    </script>
+</body>
+</html>
