@@ -8,4 +8,11 @@
 #   bin/console debug:router
 
 controllers:
-    resource: routing.controllers
+    resource:
+        path: ../src/Presentation/Controller/
+        namespace: App\Presentation\Controller
+    type: attribute
+
+# Import API documentation routes
+nelmio_api_doc:
+    resource: routes/nelmio_api_doc.yaml
