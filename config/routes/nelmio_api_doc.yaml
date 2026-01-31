@@ -1,17 +1,19 @@
 # Expose your documentation as JSON swagger compliant
-app.swagger:
+app_swagger:
     path: /api/doc.json
     methods: GET
-    defaults: { _controller: nelmio_api_doc.controller.swagger }
+    controller: nelmio_api_doc.controller.swagger
 
 # Expose your documentation as YAML swagger compliant
-app.swagger_yaml:
+app_swagger_yaml:
     path: /api/doc.yaml
     methods: GET
-    defaults: { _controller: nelmio_api_doc.controller.swagger, format: yaml }
+    controller: nelmio_api_doc.controller.swagger
+    defaults:
+        format: yaml
 
 # Expose your documentation with Swagger UI
-app.swagger_ui:
+app_swagger_ui:
     path: /api/docs
     methods: GET
-    defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
+    controller: nelmio_api_doc.controller.swagger_ui
