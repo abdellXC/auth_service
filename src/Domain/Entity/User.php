@@ -6,6 +6,7 @@ namespace App\Domain\Entity;
 
 use App\Domain\ValueObject\Email;
 use App\Domain\ValueObject\Password;
+use App\Domain\ValueObject\PasswordResetToken;
 use App\Domain\ValueObject\UserId;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,6 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: 'users')]
 #[ORM\Index(columns: ['email'], name: 'idx_users_email')]
 #[ORM\Index(columns: ['created_at'], name: 'idx_users_created_at')]
+#[ORM\Index(columns: ['reset_token'], name: 'idx_users_reset_token')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -42,6 +44,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $deletedAt = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?DateTimeImmutable $resetTokenExpiresAt = null;
 
     public function __construct(
         UserId $id,
@@ -144,5 +152,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isDeleted(): bool
     {
         return $this->deletedAt !== null;
+    }
+
+    public function setResetToken(PasswordResetToken $token): void
+    {
+        $this->resetToken = $token->getToken();
+        $this->resetTokenExpiresAt = $token->getExpiresAt();
+        $this->updatedAt = new DateTimeImmutable();
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
+    }
+
+    public function getResetTokenExpiresAt(): ?DateTimeImmutable
+    {
+        return $this->resetTokenExpiresAt;
+    }
+
+    public function hasValidResetToken(string $token): bool
+    {
+        if ($this->resetToken === null || $this->resetTokenExpiresAt === null) {
+            return false;
+        }
+
+        return hash_equals($this->resetToken, $token) 
+            && $this->resetTokenExpiresAt > new DateTimeImmutable();
+    }
+
+    public function clearResetToken(): void
+    {
+        $this->resetToken = null;
+        $this->resetTokenExpiresAt = null;
+        $this->updatedAt = new DateTimeImmutable();
     }
 }

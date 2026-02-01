@@ -1,55 +1,20 @@
 parameters:
-    jwt_ttl: 900
+    app.url: '%env(APP_URL)%'
 
 services:
     _defaults:
         autowire: true
         autoconfigure: true
-        bind:
-            $environment: '%kernel.environment%'
-            $ttl: '%jwt_ttl%'
 
     App\:
         resource: '../src/'
         exclude:
+            - '../src/DependencyInjection/'
             - '../src/Domain/Entity/'
             - '../src/Domain/ValueObject/'
-            - '../src/Domain/Enum/'
-            - '../src/Domain/Event/'
+            - '../src/Application/DTO/'
             - '../src/Kernel.php'
 
-    # Repository Interfaces
-    App\Domain\Repository\IUserRepository:
-        class: App\Infrastructure\Persistence\Repository\UserRepository
-
-    App\Domain\Repository\IOutboxRepository:
-        class: App\Infrastructure\Persistence\Repository\OutboxRepository
-
-    # Services
-    App\Application\Service\CircuitBreaker:
+    App\Application\Service\PasswordResetService:
         arguments:
-            $cache: '@cache.app'
-            $failureThreshold: 5
-            $timeout: 60
-            $logger: '@monolog.logger'
-
-    App\Application\Service\RateLimiter:
-        arguments:
-            $cache: '@cache.app'
-            $maxAttempts: 5
-            $decayMinutes: 15
-            $logger: '@monolog.logger'
-
-    # Controllers
-    App\Presentation\Controller\:
-        resource: '../src/Presentation/Controller/'
-        tags: ['controller.service_arguments']
-
-    # Exception Handler
-    App\Presentation\Exception\Handler\GlobalExceptionHandler:
-        arguments:
-            $logger: '@monolog.logger'
-            $environment: '%kernel.environment%'
-
-    # Security
-    App\Infrastructure\Security\UserProvider: ~
+            $appUrl: '%app.url%'

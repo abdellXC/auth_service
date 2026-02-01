@@ -16,6 +16,8 @@ interface IUserRepository
 
     public function findByEmail(Email $email): ?User;
 
+    public function findByResetToken(string $token): ?User;
+
     public function existsByEmail(Email $email): bool;
 
     public function delete(User $user): void;
