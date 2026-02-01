@@ -30,7 +30,10 @@ final class AuthController extends AbstractController
         private readonly TokenService $tokenService,
         private readonly RateLimiter $rateLimiter,
         private readonly ValidatorInterface $validator,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly \App\Application\Service\ForgotPasswordService $forgotPasswordService,
+        private readonly \App\Application\Service\VerifyOtpService $verifyOtpService,
+        private readonly \App\Application\Service\ResetPasswordService $resetPasswordService
     ) {
     }
 
@@ -126,17 +129,54 @@ final class AuthController extends AbstractController
         }
 
         $user = $this->registrationService->register($dto);
-        $tokenDTO = $this->tokenService->createToken($user);
-
+        
         return $this->json([
-            'user' => [
-                'id' => $user->getId()->getValue(),
-                'email' => $user->getEmail()->getValue(),
-                'name' => $user->getName(),
-                'roles' => $user->getRoles(),
-            ],
-            'token' => $tokenDTO->toArray(),
+            'message' => 'User registered successfully. Please verify your account with the OTP sent to your email.',
+            'email' => $user->getEmail()->getValue()
         ], Response::HTTP_CREATED);
+    }
+
+    #[Route('/verify-account', name: 'verify_account', methods: ['POST'])]
+    public function verifyAccount(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? '';
+        $otp = $data['otp'] ?? '';
+
+        if ($this->verifyOtpService->verifyAndActivate($email, $otp)) {
+            $user = $this->authenticationService->getUserByEmail($email);
+            $tokenDTO = $this->tokenService->createToken($user);
+            return $this->json($tokenDTO->toArray(), Response::HTTP_OK);
+        }
+
+        return $this->json(['error' => 'Invalid or expired OTP'], Response::HTTP_BAD_REQUEST);
+    }
+
+    #[Route('/forgot-password', name: 'forgot_password', methods: ['POST'])]
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? '';
+        
+        $this->forgotPasswordService->requestReset($email);
+        
+        return $this->json(['message' => 'If the account exists, an OTP has been sent.']);
+    }
+
+    #[Route('/reset-password', name: 'reset_password', methods: ['POST'])]
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'] ?? '';
+        $otp = $data['otp'] ?? '';
+        $newPassword = $data['newPassword'] ?? '';
+        
+        try {
+            $this->resetPasswordService->reset($email, $otp, $newPassword);
+            return $this->json(['message' => 'Password reset successfully.']);
+        } catch (\Exception $e) {
+            return $this->json(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
     }
 
     #[Route('/login', name: 'login', methods: ['POST'])]

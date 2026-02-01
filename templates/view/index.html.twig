@@ -3,123 +3,222 @@
 {% block title %}Auth Service - Welcome{% endblock %}
 
 {% block body %}
-<div style="font-family: sans-serif; max-width: 600px; margin: 50px auto; text-align: center; color: #333;">
+<style>
+    :root {
+        --primary: #4f46e5;
+        --secondary: #64748b;
+        --success: #10b981;
+        --danger: #ef4444;
+        --background: #f8fafc;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--background); color: #1e293b; margin: 0; }
+    .container { max-width: 450px; margin: 60px auto; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+    h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; color: #111827; }
+    .subtitle { color: var(--secondary); margin-bottom: 32px; }
+    .form-group { margin-bottom: 20px; text-align: left; }
+    label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+    input { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: border-color 0.2s; }
+    input:focus { outline: none; border-color: var(--primary); ring: 2px solid #c7d2fe; }
+    button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+    button:hover { opacity: 0.9; }
+    .tab-nav { display: flex; gap: 8px; margin-bottom: 32px; background: #f1f5f9; padding: 4px; border-radius: 10px; }
+    .tab-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; background: transparent; color: var(--secondary); }
+    .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .link-btn { background: none; border: none; color: var(--primary); font-size: 14px; padding: 0; cursor: pointer; text-decoration: underline; }
+    .alert { padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: none; }
+    .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #34d399; }
+    .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #f87171; }
+</style>
+
+<div class="container">
     <h1>Auth Service</h1>
-    <p>Bienvenue sur le microservice d'authentification.</p>
-    <hr>
+    <p class="subtitle">Microservice d'authentification sécurisé</p>
 
-    <!-- Onglets -->
-
-
-    <!-- Formulaire de Login -->
-    <div id="login-view">
-        <h2>Connexion</h2>
-        <form id="loginForm" style="display: flex; flex-direction: column; gap: 10px; text-align: left;">
-            <label>Email:</label>
-            <input type="email" id="login-email" required style="padding: 8px; width: 100%; box-sizing: border-box;">
-
-            <label>Password:</label>
-            <input type="password" id="login-password" required style="padding: 8px; width: 100%; box-sizing: border-box;">
-
-            <button type="submit" style="padding: 10px; background: #28a745; color: white; border: none; cursor: pointer;">Se connecter</button>
-        </form>
-        <p id="login-msg" style="margin-top: 10px; font-weight: bold;"></p>
+    <div class="tab-nav" id="main-nav">
+        <button class="tab-btn active" onclick="showView('login')">Connexion</button>
+        <button class="tab-btn" onclick="showView('register')">Inscription</button>
     </div>
 
-    <!-- Formulaire d'Inscription (Caché par défaut) -->
-    <div id="register-view" style="display: none;">
-        <h2>Inscription</h2>
-        <form id="registerForm" style="display: flex; flex-direction: column; gap: 10px; text-align: left;">
-            <label>Nom complet:</label>
-            <input type="text" id="reg-name" required style="padding: 8px; width: 100%; box-sizing: border-box;">
+    <!-- Alert Box -->
+    <div id="alert-box" class="alert"></div>
 
-            <label>Email:</label>
-            <input type="email" id="reg-email" required style="padding: 8px; width: 100%; box-sizing: border-box;">
-
-            <label>Password:</label>
-            <input type="password" id="reg-password" required style="padding: 8px; width: 100%; box-sizing: border-box;">
-
-            <button type="submit" style="padding: 10px; background: #007bff; color: white; border: none; cursor: pointer;">S'inscrire</button>
+    <!-- Login View -->
+    <div id="login-view" class="auth-view">
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="login-email" required placeholder="nom@exemple.com">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="login-password" required placeholder="••••••••">
+            </div>
+            <button type="submit">Se connecter</button>
         </form>
-        <p id="reg-msg" style="margin-top: 10px; font-weight: bold;"></p>
+        <p style="margin-top: 20px; font-size: 14px;">
+            <button class="link-btn" onclick="showView('forgot')">Mot de passe oublié ?</button>
+        </p>
     </div>
 
-    <hr style="margin-top: 30px;">
-    <a href="/api/health/ready" style="color: #007bff; text-decoration: none;">Vérifier la santé de l'API</a>
+    <!-- Register View -->
+    <div id="register-view" class="auth-view" style="display: none;">
+        <form id="registerForm">
+            <div class="form-group">
+                <label>Nom complet</label>
+                <input type="text" id="reg-name" required placeholder="John Doe">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="reg-email" required placeholder="nom@exemple.com">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="reg-password" required placeholder="••••••••">
+            </div>
+            <button type="submit">S'inscrire</button>
+        </form>
+    </div>
+
+    <!-- Forgot Password View -->
+    <div id="forgot-view" class="auth-view" style="display: none;">
+        <h3>Récupération</h3>
+        <p class="subtitle">Entrez votre email pour recevoir un code OTP</p>
+        <form id="forgotForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="forgot-email" required placeholder="nom@exemple.com">
+            </div>
+            <button type="submit">Envoyer le code</button>
+            <button type="button" class="tab-btn" style="margin-top: 10px;" onclick="showView('login')">Retour</button>
+        </form>
+    </div>
+
+    <!-- OTP/Reset View -->
+    <div id="otp-view" class="auth-view" style="display: none;">
+        <h3 id="otp-title">Vérification</h3>
+        <p class="subtitle" id="otp-subtitle">Entrez le code à 6 chiffres reçu par email</p>
+        <form id="otpForm">
+            <input type="hidden" id="otp-email-hidden">
+            <input type="hidden" id="otp-context"> <!-- 'register' or 'reset' -->
+            <div class="form-group">
+                <label>Code OTP</label>
+                <input type="text" id="otp-code" required maxlength="6" pattern="\d{6}" placeholder="123456" style="text-align: center; font-size: 24px; letter-spacing: 8px;">
+            </div>
+            <div id="new-password-group" class="form-group" style="display: none;">
+                <label>Nouveau mot de passe</label>
+                <input type="password" id="otp-new-password" placeholder="••••••••">
+            </div>
+            <button type="submit" id="otp-submit-btn">Vérifier</button>
+        </form>
+    </div>
 </div>
 
 <script>
-    // 1. Gestion des onglets
-    function showTab(tab) {
-        const loginView = document.getElementById('login-view');
-        const registerView = document.getElementById('register-view');
-        const btnLogin = document.getElementById('btn-login');
-        const btnRegister = document.getElementById('btn-register');
-
-        if (tab === 'login') {
-            loginView.style.display = 'block';
-            registerView.style.display = 'none';
-            btnLogin.style.background = '#007bff';
-            btnLogin.style.color = 'white';
-            btnRegister.style.background = '#eee';
-            btnRegister.style.color = '#333';
+    function showView(view) {
+        document.querySelectorAll('.auth-view').forEach(el => el.style.display = 'none');
+        document.getElementById(view + '-view').style.display = 'block';
+        
+        // Update tabs
+        const nav = document.getElementById('main-nav');
+        if (view === 'login' || view === 'register') {
+            nav.style.display = 'flex';
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = view === 'login' ? 0 : 1;
+            nav.children[activeBtn].classList.add('active');
         } else {
-            loginView.style.display = 'none';
-            registerView.style.display = 'block';
-            btnRegister.style.background = '#007bff';
-            btnRegister.style.color = 'white';
-            btnLogin.style.background = '#eee';
-            btnLogin.style.color = '#333';
+            nav.style.display = 'none';
+        }
+        
+        // Settings for OTP view
+        if (view === 'otp') {
+            const context = document.getElementById('otp-context').value;
+            document.getElementById('otp-title').innerText = context === 'reset' ? 'Réinitialisation' : 'Vérification';
+            document.getElementById('new-password-group').style.display = context === 'reset' ? 'block' : 'none';
+            document.getElementById('otp-submit-btn').innerText = context === 'reset' ? 'Changer le mot de passe' : 'Vérifier mon compte';
         }
     }
 
-    // 2. Fonction pour envoyer les données
-    async function sendData(url, data, msgId) {
-        const msgEl = document.getElementById(msgId);
-        msgEl.style.color = '#333';
-        msgEl.innerText = 'Chargement...';
+    function showAlert(msg, type = 'success') {
+        const box = document.getElementById('alert-box');
+        box.className = `alert alert-${type}`;
+        box.innerText = msg;
+        box.style.display = 'block';
+        setTimeout(() => box.style.display = 'none', 5000);
+    }
 
+    async function apiCall(url, data) {
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-
             const result = await response.json();
-
-            if (response.ok) {
-                msgEl.style.color = 'green';
-                msgEl.innerText = 'Succès !';
-                console.log('Token reçu :', result.token);
-                localStorage.setItem('token', result.token);
-            } else {
-                throw new Error(result.error || 'Erreur inconnue');
-            }
-        } catch (error) {
-            msgEl.style.color = 'red';
-            msgEl.innerText = 'Erreur : ' + error.message;
+            if (!response.ok) throw new Error(result.error || result.message || 'Erreur serveur');
+            return result;
+        } catch (e) {
+            showAlert(e.message, 'error');
+            throw e;
         }
     }
 
-    // 3. Écouteurs d'événements
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    // Handlers
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const data = {
+        const data = await apiCall('/api/login', {
             email: document.getElementById('login-email').value,
             password: document.getElementById('login-password').value
-        };
-        sendData('/api/login', data, 'login-msg');
+        });
+        showAlert('Connexion réussie !');
+        // Redirection potentielle ici
     });
 
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const data = {
-            email: document.getElementById('reg-email').value,
-            password: document.getElementById('reg-password').value,
-            name: document.getElementById('reg-name').value
-        };
-        sendData('/api/register', data, 'reg-msg');
+        const email = document.getElementById('reg-email').value;
+        try {
+            await apiCall('/api/register', {
+                email: email,
+                password: document.getElementById('reg-password').value,
+                name: document.getElementById('reg-name').value
+            });
+            document.getElementById('otp-email-hidden').value = email;
+            document.getElementById('otp-context').value = 'register';
+            showView('otp');
+            showAlert('Compte créé ! Veuillez entrer le code OTP reçu.', 'success');
+        } catch (e) {}
+    });
+
+    document.getElementById('forgotForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('forgot-email').value;
+        try {
+            await apiCall('/api/forgot-password', { email: email });
+            document.getElementById('otp-email-hidden').value = email;
+            document.getElementById('otp-context').value = 'reset';
+            showView('otp');
+            showAlert('Si l\'email existe, un code a été envoyé.', 'success');
+        } catch (e) {}
+    });
+
+    document.getElementById('otpForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const context = document.getElementById('otp-context').value;
+        const email = document.getElementById('otp-email-hidden').value;
+        const otp = document.getElementById('otp-code').value;
+
+        try {
+            if (context === 'register') {
+                const data = await apiCall('/api/verify-account', { email, otp });
+                showAlert('Compte vérifié ! Vous pouvez maintenant vous connecter.', 'success');
+                setTimeout(() => showView('login'), 2000);
+            } else {
+                const newPassword = document.getElementById('otp-new-password').value;
+                await apiCall('/api/reset-password', { email, otp, newPassword });
+                showAlert('Mot de passe modifié ! Connectez-vous.', 'success');
+                setTimeout(() => showView('login'), 2000);
+            }
+        } catch (e) {}
     });
 </script>
 {% endblock %}
