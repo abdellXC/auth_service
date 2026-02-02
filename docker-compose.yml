@@ -82,6 +82,14 @@ services:
       - redis_data:/data
     networks:
       - auth-network
+  mailhog:
+    image: mailhog/mailhog
+    container_name: auth-service-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - auth-network
 
 networks:
   auth-network:

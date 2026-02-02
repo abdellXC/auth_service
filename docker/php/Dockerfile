@@ -38,7 +38,7 @@ COPY composer.json composer.lock* ./
 
 # 2. CORRECTION : Installation des dépendances
 # Supprimé la ligne "RUN composer install..." qui était ici et inutile
-RUN XDEBUG_MODE=off composer install --no-dev --optimize-autoloader --no-scripts --no-interaction --ignore-platform-reqs \
+RUN XDEBUG_MODE=off composer update --no-dev --optimize-autoloader --no-scripts --no-interaction --ignore-platform-reqs \
     && composer clear-cache \
     && rm -rf /root/.composer/cache
 

@@ -45,22 +45,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $deletedAt = null;
 
-<<<<<<< Updated upstream
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $resetToken = null;
 
     #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $resetTokenExpiresAt = null;
-=======
-    #[ORM\Column(type: 'string', length: 6, nullable: true)]
-    private ?string $otpCode = null;
-
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
-    private ?DateTimeImmutable $otpExpiresAt = null;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $isVerified = false;
->>>>>>> Stashed changes
 
     public function __construct(
         UserId $id,
@@ -165,7 +154,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->deletedAt !== null;
     }
 
-<<<<<<< Updated upstream
     public function setResetToken(PasswordResetToken $token): void
     {
         $this->resetToken = $token->getToken();
@@ -198,43 +186,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->resetToken = null;
         $this->resetTokenExpiresAt = null;
         $this->updatedAt = new DateTimeImmutable();
-=======
-    public function isVerified(): bool
-    {
-        return $this->isVerified;
-    }
-
-    public function setVerified(bool $isVerified): void
-    {
-        $this->isVerified = $isVerified;
-        $this->updatedAt = new DateTimeImmutable();
-    }
-
-    public function setResetOtp(string $otp, DateTimeImmutable $expiresAt): void
-    {
-        $this->otpCode = $otp;
-        $this->otpExpiresAt = $expiresAt;
-        $this->updatedAt = new DateTimeImmutable();
-    }
-
-    public function verifyOtp(string $code): bool
-    {
-        if ($this->otpCode === null || $this->otpExpiresAt === null) {
-            return false;
-        }
-
-        if ($this->otpExpiresAt < new DateTimeImmutable()) {
-            return false;
-        }
-
-        return hash_equals($this->otpCode, $code);
-    }
-
-    public function clearOtp(): void
-    {
-        $this->otpCode = null; 
-        $this->otpExpiresAt = null;
-        $this->updatedAt = new DateTimeImmutable(); 
->>>>>>> Stashed changes
     }
 }

@@ -49,7 +49,6 @@ final readonly class AuthenticationService
             ]);
             throw new AuthenticationException('User account is disabled');
         }
-        
 
         // Generate tokens
         $tokenDTO = $this->tokenService->createToken($user);
@@ -60,15 +59,5 @@ final readonly class AuthenticationService
         ]);
 
         return $tokenDTO;
-    }
-     public function getUserByEmail(string $email): \App\Domain\Entity\User
-    {
-        $user = $this->userRepository->findByEmail(Email::fromString($email));
-
-        if ($user === null) {
-            throw new AuthenticationException('User not found');
-        }
-
-        return $user;
     }
 }

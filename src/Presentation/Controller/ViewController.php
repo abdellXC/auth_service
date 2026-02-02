@@ -1,18 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Presentation\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 
 class ViewController extends AbstractController
 {
-    #[Route('/', name: 'app_view')]
-    public function index(): Response
+    #[Route('/login', name: 'login_page', methods: ['GET'])]
+    public function loginPage(): Response
     {
-        return $this->render('view/index.html.twig', [
-            'controller_name' => 'ViewController',
-        ]);
+        return $this->render('auth/login.html.twig');
+    }
+
+    #[Route('/register', name: 'register_page', methods: ['GET'])]
+    public function registerPage(): Response
+    {
+        return $this->render('auth/register.html.twig');
     }
 }

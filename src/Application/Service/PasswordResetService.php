@@ -36,13 +36,13 @@ class PasswordResetService
         // Rate limiting
         $request = $this->requestStack->getCurrentRequest();
         $limiter = $this->passwordResetLimiter->create($request?->getClientIp() ?? 'unknown');
-        
+
         if (!$limiter->consume(1)->isAccepted()) {
             $this->logger->warning('Password reset rate limit exceeded', [
                 'ip' => $request?->getClientIp(),
                 'email' => $dto->getEmail()
             ]);
-            
+
             // Still return success to prevent email enumeration
             return;
         }
@@ -66,7 +66,7 @@ class PasswordResetService
         // Send email
         try {
             $resetUrl = sprintf(
-                '%s/reset-password?token=%s',
+                '%s/password/reset-form?token=%s',
                 rtrim($this->appUrl, '/'),
                 $resetToken->getToken()
             );

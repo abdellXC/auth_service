@@ -187,9 +187,8 @@
         </form>
 
         <div class="back-link">
-            <a href="/api/login">← Back to Login</a>
+            <a href="/login">← Back to Login</a>
         </div>
-    </div>
 
     <script>
         const form = document.getElementById('forgotPasswordForm');
@@ -220,7 +219,7 @@
             btnText.innerHTML = '<span class="loader"></span>Sending...';
 
             try {
-                const response = await fetch('/api/password/forgot', {
+                const response = await fetch('/password/forgot', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

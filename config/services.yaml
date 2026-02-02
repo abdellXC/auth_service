@@ -1,5 +1,10 @@
 parameters:
     app.url: '%env(APP_URL)%'
+    circuit_breaker.failure_threshold: 5
+    circuit_breaker.timeout: 60
+    rate_limiter.max_attempts: 5
+    rate_limiter.decay_minutes: 1
+    token.ttl: 3600
 
 services:
     _defaults:
@@ -18,3 +23,21 @@ services:
     App\Application\Service\PasswordResetService:
         arguments:
             $appUrl: '%app.url%'
+
+    App\Application\Service\CircuitBreaker:
+        arguments:
+            $failureThreshold: '%circuit_breaker.failure_threshold%'
+            $timeout: '%circuit_breaker.timeout%'
+
+    App\Application\Service\RateLimiter:
+        arguments:
+            $maxAttempts: '%rate_limiter.max_attempts%'
+            $decayMinutes: '%rate_limiter.decay_minutes%'
+
+    App\Application\Service\TokenService:
+        arguments:
+            $ttl: '%token.ttl%'
+
+    App\Presentation\Exception\Handler\GlobalExceptionHandler:
+        arguments:
+            $environment: '%kernel.environment%'
