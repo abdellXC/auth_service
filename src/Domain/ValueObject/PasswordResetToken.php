@@ -9,7 +9,7 @@ use DateTimeImmutable;
 final class PasswordResetToken
 {
     private const TOKEN_LENGTH = 64;
-    private const EXPIRATION_HOURS = 1;
+    private const EXPIRATION_HOURS = 24;
 
     private string $token;
     private DateTimeImmutable $expiresAt;

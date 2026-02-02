@@ -214,13 +214,13 @@
 
         <form id="resetPasswordForm">
             <input type="hidden" id="token" name="token" value="{{ token }}">
-            
+
             <div class="form-group">
                 <label for="password">New Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    name="password" 
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
                     placeholder="Enter new password"
                     required
                     autocomplete="new-password"
@@ -239,10 +239,10 @@
 
             <div class="form-group">
                 <label for="passwordConfirmation">Confirm Password</label>
-                <input 
-                    type="password" 
-                    id="passwordConfirmation" 
-                    name="passwordConfirmation" 
+                <input
+                    type="password"
+                    id="passwordConfirmation"
+                    name="passwordConfirmation"
                     placeholder="Confirm new password"
                     required
                     autocomplete="new-password"
@@ -255,7 +255,7 @@
         </form>
 
         <div class="back-link">
-            <a href="/api/login">← Back to Login</a>
+            <a href="/login">← Back to Login</a>
         </div>
     </div>
 
@@ -279,7 +279,7 @@
 
         async function verifyToken() {
             const token = tokenInput.value;
-            
+
             if (!token) {
                 showAlert('Invalid reset link. Please request a new password reset.', 'error');
                 submitBtn.disabled = true;
@@ -289,7 +289,7 @@
             loadingOverlay.style.display = 'flex';
 
             try {
-                const response = await fetch(`/api/password/reset/verify/${token}`);
+                const response = await fetch(`/password/reset/verify/${token}`);
                 const data = await response.json();
 
                 if (!data.valid) {
@@ -308,7 +308,7 @@
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const token = tokenInput.value;
             const password = passwordInput.value;
             const passwordConfirmation = passwordConfirmationInput.value;
@@ -327,7 +327,7 @@
             btnText.innerHTML = '<span class="loader"></span>Resetting...';
 
             try {
-                const response = await fetch('/api/password/reset', {
+                const response = await fetch('/password/reset', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -345,13 +345,13 @@
                     showAlert('Password successfully reset! Redirecting to login...', 'success');
                     passwordInput.value = '';
                     passwordConfirmationInput.value = '';
-                    
+
                     setTimeout(() => {
-                        window.location.href = '/api/login';
+                        window.location.href = '/login';
                     }, 2000);
                 } else {
-                    const errorMessage = data.error || 
-                                       data.errors?.password || 
+                    const errorMessage = data.error ||
+                                       data.errors?.password ||
                                        data.errors?.passwordConfirmation ||
                                        'An error occurred. Please try again.';
                     showAlert(errorMessage, 'error');
